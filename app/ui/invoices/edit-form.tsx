@@ -26,7 +26,7 @@ export default function EditInvoiceForm({
         {/* Customer Name */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">
-            Selecciona un cliente
+            Elige un cliente
           </label>
           <div className="relative">
             <select
@@ -36,7 +36,7 @@ export default function EditInvoiceForm({
               defaultValue={invoice.customer_id}
             >
               <option value="" disabled>
-                Seleccionar un cliente
+                Elige un cliente
               </option>
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
@@ -51,7 +51,7 @@ export default function EditInvoiceForm({
         {/* Invoice Amount */}
         <div className="mb-4">
           <label htmlFor="amount" className="mb-2 block text-sm font-medium">
-            Establecer el monto
+            Indica el monto
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
@@ -61,7 +61,7 @@ export default function EditInvoiceForm({
                 type="number"
                 step="0.01"
                 defaultValue={invoice.amount}
-                placeholder="Enter USD amount"
+                placeholder="Monto en USD"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
@@ -72,7 +72,7 @@ export default function EditInvoiceForm({
         {/* Invoice Status */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
-            Cambiar el estatus de la orden
+            Estatus de la orden
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">

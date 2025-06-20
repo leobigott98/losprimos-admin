@@ -16,7 +16,7 @@ export default async function RevenueChart() {
   // NOTE: Uncomment this code in Chapter 7
 
    if (!revenue || revenue.length === 0) {
-     return <p className="mt-4 text-gray-400">No data available.</p>;
+     return <p className="mt-4 text-gray-400">Sin data disponible.</p>;
    }
 
    const { yAxisLabels, topLabel } = generateYAxis(revenue);
@@ -24,7 +24,7 @@ export default async function RevenueChart() {
   return (
     <div className="w-full md:col-span-4">
       <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Recent Revenue
+        Ganancias Recientes
       </h2>
       {/* NOTE: Uncomment this code in Chapter 7 */}
 
@@ -55,7 +55,7 @@ export default async function RevenueChart() {
         </div>
         <div className="flex items-center pb-2 pt-6">
           <CalendarIcon className="h-5 w-5 text-gray-500" />
-          <h3 className="ml-2 text-sm text-gray-500 ">Last 12 months</h3>
+          <h3 className="ml-2 text-sm text-gray-500 ">Últimos 12 meses</h3>
         </div>
       </div>
     </div>
