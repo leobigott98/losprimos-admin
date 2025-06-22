@@ -8,7 +8,7 @@ export default function SideNav() {
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
       <Link
-        className="sm:bg-[url('/logo1 - horizontal.jpg')] sm:h-10 mb-2 rounded-md md:bg-[url('/logo1.jpg')] bg-cover md:h-40"
+        className="bg-[url('/logo1-horizontal.jpg')] h-28 mb-2 rounded-md md:bg-[url('/logo1.jpg')] bg-cover md:h-40"
         href="/dashboard"
       >
         {/* <Image 
