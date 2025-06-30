@@ -2,6 +2,66 @@
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
 // However, these types are generated automatically if you're using an ORM such as Prisma.
+
+//declarar modelo de data nombre tabla campo:tipo
+export type Cliente = {
+  cliente_id: number;
+  cliente_nombre: string;
+  status_valor: number;
+  creado: Date;
+}
+
+export type Menu = {
+  menu_id: number;
+  rest_valor: string;
+  menu_descricion: string;
+  menu_precio: number;
+  cat_id: number;
+  menu_disponibilidad: number;
+  creado: Date;
+  actualizado: Date;
+}
+
+export type Ordenes = {
+  orden_id: number;
+  orden_num: number;
+  orden_fecha: Date;
+  cliente_telefono: string;
+  orden_detalle: string;
+  orden_total: number;
+  orden_status: string;
+  create_at: Date;
+}
+
+export type Sabores = {
+  sabor_id: number;
+  sabor_nombre: string;
+  sabor_disponible: number;
+  sabor_categoria: string;
+  creado: Date;
+  actualizado: Date;
+}
+
+export type Status = {
+  status_id: number;
+  status_tipo: string;
+  status_valor: number;
+  status_nombre: string;
+  status_descripcion: Date;
+  creado: Date;
+}
+
+export type Usuarios = {
+  usuario_id: number;
+  usuario_nombre: string;
+  usuario_apellido: string;
+  usuario_email: string;
+  usuario_clave: string;
+  status_valor: number;
+  creado: Date;
+  actualizado: Date;
+}
+
 export type User = {
   id: string;
   name: string;

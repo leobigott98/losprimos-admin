@@ -1,15 +1,32 @@
-import postgres from 'postgres';
-import {
+//import postgres from 'postgres';
+import { pool } from '../config/mysql';
+/*import {
   CustomerField,
   CustomersTableType,
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
-} from './definitions';
+} from './definitions';*/
+import {
+  Cliente
+} from './definitions'
+
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+//const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+
+//estructura de funciones query 
+export async function fetchClientes() {
+  try{
+    const response = await pool.query('call get_clientes()');
+    console.log(response);
+    const clientes = response[0];
+    return clientes;
+  } catch (error){
+    console.log(error);
+  }
+}
 
 export async function fetchRevenue() {
   try {
