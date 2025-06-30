@@ -1,30 +1,31 @@
-//import postgres from 'postgres';
+import postgres from 'postgres';
 import { pool } from '../config/mysql';
-/*import {
+import {
   CustomerField,
   CustomersTableType,
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
-} from './definitions';*/
+} from './definitions';
 import {
   Cliente
 } from './definitions'
+import mysql, { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
 
 import { formatCurrency } from './utils';
 
-//const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 //estructura de funciones query 
 export async function fetchClientes() {
   try{
-    const response = await pool.query('call get_clientes()');
-    console.log(response);
-    const clientes = response[0];
-    return clientes;
+    const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('call get_clientes()');
+    const customers: Cliente[] = response[0] as Cliente[];
+    return(customers);
   } catch (error){
     console.log(error);
+    throw new Error('Failed to fetch customers');
   }
 }
 
