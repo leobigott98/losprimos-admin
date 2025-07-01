@@ -10,6 +10,7 @@ import {
   LatestInvoiceRaw,
   OrdenesTable,
   Revenue,
+  Sabores,
 } from './definitions';
 import {
   Cliente,
@@ -20,7 +21,7 @@ import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
 import { formatCurrency } from './utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 // Fetch customers
 export async function fetchClientes() {
@@ -325,5 +326,67 @@ export async function fetchCustomers() {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch all customers.');
+  }
+}
+
+// Fetch fillings
+export async function fetchFillings() {
+  try{
+    const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query('SELECT * FROM sabores;');
+    const fillings: Sabores[] = response[0] as Sabores[];
+    return(fillings);
+  } catch (error){
+    console.log(error);
+    throw new Error('Failed to fetch fillings');
+  }
+}
+
+export async function fetchFilteredFillings(
+  query: string,
+  currentPage: number,
+){
+  try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+    const searchTerm = `%${query.toLowerCase()}%`
+    const [response]: [QueryResult, FieldPacket[]] = await pool.query(
+      `SELECT * 
+      FROM sabores
+       WHERE (
+        LOWER(sabor_nombre) LIKE ? OR
+        LOWER(sabor_categoria) LIKE ?
+      )
+      ORDER BY creado DESC
+      LIMIT ? OFFSET ?;`,
+      [searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
+    );
+    const fillings: Sabores[] = response as Sabores[];
+    return(fillings);
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to fetch filtered fillings')
+  }
+}
+
+export async function fetchFillingsPages(query: string) {
+  try {
+    const searchTerm = `%${query.toLowerCase()}%`;
+
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM (
+        SELECT * 
+      FROM sabores
+       WHERE (
+        LOWER(sabor_nombre) LIKE ? OR
+        LOWER(sabor_categoria) LIKE ?
+      )) n_fillings ;`, 
+      [searchTerm, searchTerm]
+    );
+
+    const totalRows = rows[0].total as number;
+    const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
+    return totalPages; 
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of customers.');
   }
 }

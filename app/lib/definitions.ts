@@ -58,7 +58,7 @@ export type Sabores = {
   sabor_disponible: number;
   sabor_categoria: 'normal' | 'mar';
   creado: Date;
-  actualizado: Date;
+  actualizado: Date | null;
 }
 
 export type Status = {

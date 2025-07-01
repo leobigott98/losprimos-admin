@@ -4,8 +4,37 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
+import { pool } from '../config/mysql';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+
+const FillingsFormSchema = z.object({
+    sabor_id: z.number(),
+    sabor_nombre: z.string(),
+    sabor_disponible: z.number(),
+    sabor_categoria: z.enum(['normal', 'mar']),
+    creado: z.date(),
+    actualizado: z.date(),
+})
+
+const CreateFilling = FillingsFormSchema.omit({sabor_id: true, sabor_disponible: true, creado: true, actualizado: true});
+
+export async function createFilling(formData: FormData) {
+    const { sabor_nombre, sabor_categoria} = CreateFilling.parse({
+        sabor_nombre: formData.get('sabor_nombre'),
+        sabor_categoria: formData.get('sabor_categoria'),
+    })
+
+    try {
+        const response = await pool.query('CALL add_sabor(?, ?)', [sabor_nombre, sabor_categoria]);
+        console.log(response);
+    } catch (error) {
+        console.error('Database Error:', error);
+        throw new Error('Failed to create new filling.');
+    }
+    revalidatePath('/dashboard/fillings');
+    redirect('/dashboard/fillings');
+}
 
 const FormSchema = z.object({
     id: z.string(),
