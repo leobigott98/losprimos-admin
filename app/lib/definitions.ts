@@ -41,6 +41,17 @@ export type Ordenes = {
   create_at: Date;
 }
 
+export type OrdenesTable = {
+  id: string;
+  name: string;
+  order_num: number;
+  created_at: Date;
+  phone: string;
+  detail: string;
+  amount: number;
+  status: string | null;
+} 
+
 export type Sabores = {
   sabor_id: number;
   sabor_nombre: string;

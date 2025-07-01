@@ -7,13 +7,14 @@ import {
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
+  OrdenesTable,
   Revenue,
 } from './definitions';
 import {
   Cliente,
   Ordenes
 } from './definitions'
-import mysql, { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
+import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
 
 import { formatCurrency } from './utils';
 
@@ -98,6 +99,70 @@ export async function fetchOrders() {
   } catch (error){
     console.log(error);
     throw new Error('Failed to fetch orders');
+  }
+}
+
+export async function fetchFilteredOrders(
+  query: string,
+  currentPage: number
+){
+  try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+    const searchTerm = `%${query.toLowerCase()}%`
+    const [response]: [QueryResult, FieldPacket[]] = await pool.query(
+      `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS status, create_at AS created_at 
+      FROM ordenes
+      LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+       WHERE (
+        LOWER(clientes.cliente_nombre) LIKE ? OR
+        LOWER(ordenes.orden_num) LIKE ? OR 
+        LOWER(ordenes.cliente_telefono) LIKE ? OR 
+        LOWER(ordenes.orden_detalle) LIKE ? OR 
+        LOWER(ordenes.orden_total) LIKE ? OR 
+        LOWER(ordenes.orden_status) LIKE ? OR 
+        LOWER(ordenes.create_at) LIKE ?
+      )
+      ORDER BY ordenes.create_at DESC
+      LIMIT ? OFFSET ?;`,
+      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
+    );
+    const orders: OrdenesTable[] = response as OrdenesTable[];
+    return(orders);
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to fetch filtered customers')
+  }
+}
+
+export async function fetchOrdersPages(query: string) {
+  try {
+    const searchTerm = `%${query.toLowerCase()}%`;
+
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM (
+        SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS status, create_at AS created_at 
+      FROM ordenes
+      LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+       WHERE (
+        LOWER(name) LIKE ? OR
+        LOWER(orden_num) LIKE ? OR 
+        LOWER(phone) LIKE ? OR 
+        LOWER(detail) LIKE ? OR 
+        LOWER(total) LIKE ? OR 
+        LOWER(status) LIKE ? OR 
+        LOWER(created_at) LIKE ? 
+      )
+      ORDER BY created_at DESC
+        ) n_clientes ;`, 
+      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]
+    );
+
+    const totalRows = rows[0].total as number;
+    const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
+    return totalPages; 
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of customers.');
   }
 }
 
