@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
+import { UpdateInvoice, DeleteInvoice, ViewDetail } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredInvoices, fetchFilteredOrders } from '@/app/lib/data';
@@ -34,14 +34,21 @@ export default async function InvoicesTable({
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
-                    <p className="text-xl font-medium">
-                      {formatCurrency(order.amount)}
-                    </p>
+                    <div className='flex justify-between'>
+                      <p className="text-xl font-medium">
+                      {order.order_num}
+                      </p>
+                      <p className='text-sm font-normal'>
+                        {formatCurrency(order.amount)}
+                      </p>
+                    </div>
                     <p>{formatDateToLocal(order.created_at)}</p>
                   </div>
                   <div className="flex justify-end gap-2">
-                    <UpdateInvoice id={order.id} />
-                    <DeleteInvoice id={order.id} />
+                    {/* Commented for later use */}
+                    {/* <UpdateInvoice id={order.id} />
+                    <DeleteInvoice id={order.id} /> */}
+                    <ViewDetail id={order.id} />
                   </div>
                 </div>
               </div>
@@ -103,8 +110,10 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                      <UpdateInvoice id={order.id} />
-                      <DeleteInvoice id={order.id} />
+                      {/* Commented for later use */}
+                      {/* <UpdateInvoice id={order.id} />
+                      <DeleteInvoice id={order.id} /> */}
+                      <ViewDetail id={order.id} />
                     </div>
                   </td>
                 </tr>

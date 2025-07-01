@@ -166,6 +166,24 @@ export async function fetchOrdersPages(query: string) {
   }
 }
 
+export async function fetchOrderById(id: string) {
+  try {
+    const [response]: [QueryResult, FieldPacket[]] = await pool.query(
+      `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS status, create_at AS created_at 
+      FROM ordenes
+      LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+      WHERE ordenes.orden_id = UUID_TO_BIN(?);`,
+      [id]
+    );
+
+    const order: OrdenesTable[] = response as OrdenesTable[] ;
+    return(order);
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch order.');
+  }
+}
+
 export async function fetchRevenue() {
   try {
     const data = await sql<Revenue[]>`SELECT * FROM revenue`;
