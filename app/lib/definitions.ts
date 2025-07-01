@@ -11,6 +11,14 @@ export type Cliente = {
   creado: Date;
 }
 
+export type ClienteTable = {
+  total_paid: number;
+  phone: string,
+  n_orders: number,
+  cliente_nombre: string | null,
+  created_at: Date | null
+}
+
 export type Menu = {
   menu_id: number;
   rest_valor: string;
@@ -37,7 +45,7 @@ export type Sabores = {
   sabor_id: number;
   sabor_nombre: string;
   sabor_disponible: number;
-  sabor_categoria: string;
+  sabor_categoria: 'normal' | 'mar';
   creado: Date;
   actualizado: Date;
 }

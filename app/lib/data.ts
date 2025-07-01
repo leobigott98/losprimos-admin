@@ -1,6 +1,7 @@
 import postgres from 'postgres';
 import { pool } from '../config/mysql';
 import {
+  ClienteTable,
   CustomerField,
   CustomersTableType,
   InvoiceForm,
@@ -9,15 +10,17 @@ import {
   Revenue,
 } from './definitions';
 import {
-  Cliente
+  Cliente,
+  Ordenes
 } from './definitions'
 import mysql, { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
 
 import { formatCurrency } from './utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const ITEMS_PER_PAGE = 6;
 
-//estructura de funciones query 
+// Fetch customers
 export async function fetchClientes() {
   try{
     const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('call get_clientes()');
@@ -29,14 +32,77 @@ export async function fetchClientes() {
   }
 }
 
+export async function fetchFilteredClientes(
+  query: string,
+  currentPage: number,
+){
+  try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+    const searchTerm = `%${query.toLowerCase()}%`
+    const [response]: [QueryResult, FieldPacket[]] = await pool.query(
+      `SELECT SUM(orden_total) AS 'total_paid', cliente_telefono AS 'phone', COUNT(orden_id) AS 'n_orders', cliente_nombre, clientes.creado AS created_at 
+      FROM ordenes
+      LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+       WHERE (
+        LOWER(cliente_nombre) LIKE ? OR
+        LOWER(cliente_telefono) LIKE ?
+      )
+      GROUP BY cliente_telefono
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?;`,
+      [searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
+    );
+    const customers: ClienteTable[] = response as ClienteTable[];
+    return(customers);
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to fetch filtered customers')
+  }
+}
+
+export async function fetchClientesPages(query: string) {
+  try {
+    const searchTerm = `%${query.toLowerCase()}%`;
+
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM (
+        SELECT SUM(orden_total) AS 'total_paid', cliente_telefono AS 'phone', COUNT(orden_id) AS 'n_orders', cliente_nombre, clientes.creado AS created_at 
+        FROM ordenes
+        LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+        WHERE (
+          LOWER(clientes.cliente_nombre) LIKE ? OR
+          LOWER(clientes.cliente_id) LIKE ? OR
+          LOWER(clientes.creado) LIKE ?
+        )
+        GROUP BY cliente_telefono
+        ORDER BY created_at DESC
+        ) n_clientes ;`, 
+      [searchTerm, searchTerm, searchTerm]
+    );
+
+    const totalRows = rows[0].total as number;
+    const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
+    return totalPages; 
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of customers.');
+  }
+}
+
+// Fetch orders
+export async function fetchOrders() {
+  try{
+    const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('call get_ordenes()');
+    const orders: Ordenes[] = response[0] as Ordenes[];
+    return(orders);
+  } catch (error){
+    console.log(error);
+    throw new Error('Failed to fetch orders');
+  }
+}
+
 export async function fetchRevenue() {
   try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-     /* console.log('Fetching revenue data...');
-     await new Promise((resolve) => setTimeout(resolve, 3000)); */
-
     const data = await sql<Revenue[]>`SELECT * FROM revenue`;
 
      console.log('Data fetch completed after 3 seconds.');
@@ -103,7 +169,7 @@ export async function fetchCardData() {
   }
 }
 
-const ITEMS_PER_PAGE = 6;
+
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
@@ -141,19 +207,27 @@ export async function fetchFilteredInvoices(
 
 export async function fetchInvoicesPages(query: string) {
   try {
-    const data = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
-  `;
+    const searchTerm = `%${query.toLowerCase()}%`;
 
-    const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
-    return totalPages;
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      `SELECT COUNT(*) AS total
+      FROM ordenes
+      JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+      WHERE (
+        LOWER(clientes.cliente_nombre) LIKE ? OR
+        LOWER(clientes.cliente_id) LIKE ? OR
+        LOWER(ordenes.create_at) LIKE ? OR
+        LOWER(ordenes.orden_total) LIKE ? OR
+        LOWER(ordenes.orden_status) LIKE ? OR
+        LOWER(ordenes.orden_num) LIKE ? OR
+        LOWER(ordenes.orden_detalle) LIKE ?
+      )`, 
+      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]
+    );
+
+    const totalRows = rows[0].total as number;
+    const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
+    return totalPages; 
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of invoices.');
