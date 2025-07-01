@@ -1,6 +1,6 @@
 import Form from '@/app/ui/invoices/view-detail';
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
-import { fetchInvoiceById, fetchCustomers, fetchOrderById } from '@/app/lib/data';
+import { fetchOrderById } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 import { OrdenesTable } from '@/app/lib/definitions';
  
