@@ -38,6 +38,7 @@ export type Ordenes = {
   orden_detalle: string;
   orden_total: number;
   orden_status: string;
+  status_nombre: string;
   create_at: Date;
 }
 
@@ -50,6 +51,7 @@ export type OrdenesTable = {
   detail: string;
   amount: number;
   status: string | null;
+  payment: string | null;
 } 
 
 export type Sabores = {

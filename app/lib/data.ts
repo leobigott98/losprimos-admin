@@ -106,21 +106,25 @@ export async function fetchFilteredOrders(
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
     const searchTerm = `%${query.toLowerCase()}%`
     const [response]: [QueryResult, FieldPacket[]] = await pool.query(
-      `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS status, create_at AS created_at 
+      `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS payment, p_status.status_nombre AS status, create_at AS created_at 
       FROM ordenes
       LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+      LEFT JOIN p_status ON ordenes.status_valor = p_status.status_valor
        WHERE (
+        p_status.status_tipo = 'ordenes' AND (
         LOWER(clientes.cliente_nombre) LIKE ? OR
         LOWER(ordenes.orden_num) LIKE ? OR 
         LOWER(ordenes.cliente_telefono) LIKE ? OR 
         LOWER(ordenes.orden_detalle) LIKE ? OR 
         LOWER(ordenes.orden_total) LIKE ? OR 
         LOWER(ordenes.orden_status) LIKE ? OR 
+        LOWER(p_status.status_nombre) LIKE ? OR
         LOWER(ordenes.create_at) LIKE ?
+    )
       )
       ORDER BY ordenes.create_at DESC
       LIMIT ? OFFSET ?;`,
-      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
+      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
     );
     const orders: OrdenesTable[] = response as OrdenesTable[];
     return(orders);

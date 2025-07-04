@@ -73,6 +73,9 @@ export default async function InvoicesTable({
                   Fecha
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
+                  Pago
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
                   Estatus
                 </th>
                 <th scope="col" className="relative py-3 pl-6 pr-3">
@@ -106,13 +109,13 @@ export default async function InvoicesTable({
                     {formatDateToLocal(order.created_at)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
+                    {order.payment?? 'pendiente'}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
                     <InvoiceStatus status={order.status?? 'pending'} />
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                      {/* Commented for later use */}
-                      {/* <UpdateInvoice id={order.id} />
-                      <DeleteInvoice id={order.id} /> */}
                       <ViewDetail id={order.id} />
                     </div>
                   </td>
