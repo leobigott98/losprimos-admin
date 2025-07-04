@@ -1,11 +1,10 @@
 import Pagination from '@/app/ui/pagination';
 import Search from '@/app/ui/search';
-import Table from '@/app/ui/invoices/table';
 import { AddFilling } from '@/app/ui/fillings/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchFillingsPages, fetchInvoicesPages } from '@/app/lib/data';
+import { fetchFillingsPages } from '@/app/lib/data';
 import FillingsTable from '@/app/ui/fillings/table';
  
 export default async function Page(props: {

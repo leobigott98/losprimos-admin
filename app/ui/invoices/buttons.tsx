@@ -1,5 +1,3 @@
-import { deleteInvoice } from '@/app/lib/actions';
-import { OrdenesTable } from '@/app/lib/definitions';
 import { PencilIcon, PlusIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -26,7 +24,7 @@ export function UpdateInvoice({ id }: { id: string }) {
   );
 }
 
-export function DeleteInvoice({ id }: { id: string }) {
+/* export function DeleteInvoice({ id }: { id: string }) {
   const deleteInvoiceWithId = deleteInvoice.bind(null, id);
 
   return (
@@ -37,7 +35,7 @@ export function DeleteInvoice({ id }: { id: string }) {
       </button>
     </form>
   );
-}
+} */
 
 export function ViewDetail({ id }: {id: string }){
   return (

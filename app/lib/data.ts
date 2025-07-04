@@ -1,11 +1,6 @@
-import postgres from 'postgres';
 import { pool } from '../config/mysql';
 import {
   ClienteTable,
-  CustomerField,
-  CustomersTableType,
-  InvoiceForm,
-  InvoicesTable,
   LatestInvoice,
   LatestInvoiceRaw,
   OrdenesTable,
@@ -20,7 +15,6 @@ import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
 
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 const ITEMS_PER_PAGE = 10;
 
 // Fetch customers
@@ -284,48 +278,6 @@ FROM ordenes;`);
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch card data.');
-  }
-}
-
-export async function fetchInvoiceById(id: string) {
-  try {
-    const data = await sql<InvoiceForm[]>`
-      SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
-    `;
-
-    const invoice = data.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
-    }));
-
-    return invoice[0];
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
-  }
-}
-
-export async function fetchCustomers() {
-  try {
-    const customers = await sql<CustomerField[]>`
-      SELECT
-        id,
-        name
-      FROM customers
-      ORDER BY name ASC
-    `;
-
-    return customers;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
   }
 }
 

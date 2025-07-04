@@ -12,7 +12,6 @@ import {
 import { formatCurrency, formatDateToLocal } from '@/app/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { updateInvoice } from '@/app/lib/actions';
 
 export default function EditInvoiceForm({
   order

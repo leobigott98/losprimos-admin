@@ -1,6 +1,3 @@
-import Image from "next/image";
-import { UpdateInvoice, DeleteInvoice } from "@/app/ui/invoices/buttons";
-import InvoiceStatus from "@/app/ui/invoices/status";
 import { formatDateToLocal, formatCurrency } from "@/app/lib/utils";
 import { fetchFilteredFillings } from "@/app/lib/data";
 import { toggleFillingAvailability } from "@/app/lib/actions";
@@ -123,8 +120,6 @@ export default async function FillingsTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                      {/* <UpdateInvoice id={invoice.id} />
-                      <DeleteInvoice id={invoice.id} /> */}
                     </div>
                   </td>
                 </tr>
