@@ -175,3 +175,14 @@ export async function registerUser(
     return 'Ocurrió un error en el servidor.';
   }
 }
+
+export async function toggleFillingAvailability(id: number, currentValue: number) {
+  try {
+    const newValue = currentValue === 1 ? 0 : 1;
+    await pool.query('UPDATE sabores SET sabor_disponible = ?, actualizado = (NOW() - INTERVAL 240 MINUTE) WHERE sabor_id = ?', [newValue, id]);
+    revalidatePath('/dashboard/fillings'); // Refresh table
+  } catch (error) {
+    console.error('DB Error:', error);
+    throw new Error('Failed to toggle availability.');
+  }
+}

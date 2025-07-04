@@ -1,8 +1,9 @@
-import Image from 'next/image';
-import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
-import InvoiceStatus from '@/app/ui/invoices/status';
-import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredFillings } from '@/app/lib/data';
+import Image from "next/image";
+import { UpdateInvoice, DeleteInvoice } from "@/app/ui/invoices/buttons";
+import InvoiceStatus from "@/app/ui/invoices/status";
+import { formatDateToLocal, formatCurrency } from "@/app/lib/utils";
+import { fetchFilteredFillings } from "@/app/lib/data";
+import { toggleFillingAvailability } from "@/app/lib/actions";
 
 export default async function FillingsTable({
   query,
@@ -28,7 +29,9 @@ export default async function FillingsTable({
                     <div className="mb-2 flex items-center">
                       <p>{filling.sabor_nombre}</p>
                     </div>
-                    <p className="text-sm text-gray-500">{filling.sabor_categoria}</p>
+                    <p className="text-sm text-gray-500">
+                      {filling.sabor_categoria}
+                    </p>
                   </div>
                   {/* <InvoiceStatus status={filling.sabor_disponible} /> */}
                 </div>
@@ -37,13 +40,15 @@ export default async function FillingsTable({
                     <p className="text-xl font-medium">
                       {formatDateToLocal(filling.creado)}
                     </p>
-                    <p>{filling.actualizado !== null ? formatDateToLocal(filling.actualizado) : '-'}</p>
+                    <p>
+                      {filling.actualizado !== null
+                        ? formatDateToLocal(filling.actualizado)
+                        : "-"}
+                    </p>
                   </div>
                   <div className="flex justify-end gap-2">
-
                     {/* <UpdateInvoice id={invoice.id} />
                     <DeleteInvoice id={invoice.id} /> */}
-
                   </div>
                 </div>
               </div>
@@ -90,17 +95,36 @@ export default async function FillingsTable({
                     {formatDateToLocal(filling.creado)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {filling.actualizado !== null ? formatDateToLocal(filling.actualizado) : '-'}
+                    {filling.actualizado !== null
+                      ? formatDateToLocal(filling.actualizado)
+                      : "-"}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {/* <InvoiceStatus status={invoice.status} /> */}
+                    <form
+                      action={async () => {
+                        "use server";
+                        await toggleFillingAvailability(
+                          filling.sabor_id,
+                          filling.sabor_disponible
+                        );
+                      }}
+                    >
+                      <button
+                        type="submit"
+                        className={`rounded-full px-3 py-1 text-sm font-medium transition ${
+                          filling.sabor_disponible
+                            ? "bg-green-200 text-green-800 hover:bg-green-300"
+                            : "bg-red-200 text-red-800 hover:bg-red-300"
+                        }`}
+                      >
+                        {filling.sabor_disponible ? "Disponible" : "Agotado"}
+                      </button>
+                    </form>
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-
                       {/* <UpdateInvoice id={invoice.id} />
                       <DeleteInvoice id={invoice.id} /> */}
-
                     </div>
                   </td>
                 </tr>
