@@ -1,25 +1,43 @@
-'use client';
+"use client";
 
-import { lusitana } from '@/app/ui/fonts';
+import { lusitana } from "@/app/ui/fonts";
 import {
   AtSymbolIcon,
   KeyIcon,
   ExclamationCircleIcon,
   UserCircleIcon,
-} from '@heroicons/react/24/outline';
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { Button } from '@/app/ui/button';
-import { useActionState } from 'react';
-import { registerUser } from '@/app/lib/actions';
-import { useSearchParams } from 'next/navigation';
+} from "@heroicons/react/24/outline";
+import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { Button } from "@/app/ui/button";
+import { useActionState, useEffect, useState } from "react";
+import { registerUser } from "@/app/lib/actions";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function SignUpForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const router = useRouter();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, formAction, isPending] = useActionState(
-    registerUser,
-    undefined,
+    async (prevState: string | undefined, formData: FormData) => {
+      setHasSubmitted(true); // ✅ Mark as submitted
+      return await registerUser(prevState, formData);
+    },
+    undefined
   );
+
+  // Redirect to login after successful registration
+  useEffect(() => {
+    if (hasSubmitted && !errorMessage && isPending === false ) {
+      setShowSuccess(true);
+      setTimeout(()=>{
+        router.push("/auth/sign-in");
+      }, 1000, )
+      
+    }
+  }, [errorMessage, isPending, router]);
 
   return (
     <form action={formAction} className="space-y-3">
@@ -31,7 +49,7 @@ export default function SignUpForm() {
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-              htmlFor="email"
+              htmlFor="nombre"
             >
               Nombre
             </label>
@@ -50,7 +68,7 @@ export default function SignUpForm() {
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
-              htmlFor="email"
+              htmlFor="apellido"
             >
               Apellido
             </label>
@@ -108,7 +126,16 @@ export default function SignUpForm() {
         </div>
         <input type="hidden" name="redirectTo" value={callbackUrl} />
         <Button className="mt-4 w-full" aria-disabled={isPending}>
-          Registrarse <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+          Registrarse{" "}
+          <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+        </Button>
+        <Button
+          type="button"
+          onClick={() => router.push("/auth/sign-in")}
+          className="mt-4 w-full rounded-md px-4 py-2 text-gray-700 bg-gray-300 hover:bg-gray-200 transition mx-auto active:bg-gray-600"
+        >
+          Cancelar
+          <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
         <div
           className="flex h-8 items-end space-x-1"
@@ -121,7 +148,13 @@ export default function SignUpForm() {
               <p className="text-sm text-red-500">{errorMessage}</p>
             </>
           )}
-          </div>
+          {showSuccess && (
+            <>
+              <ExclamationCircleIcon className="h-5 w-5 text-green-600" />
+              <p className="text-sm text-green-600">¡Registro exitoso! Redirigiendo al inicio de sesión...</p>
+            </>
+          )}
+        </div>
       </div>
     </form>
   );

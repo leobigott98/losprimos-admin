@@ -11,10 +11,12 @@ import { Button } from './button';
 import { useActionState } from 'react';
 import { authenticate } from '@/app/lib/actions';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const router = useRouter();
   const [errorMessage, formAction, isPending] = useActionState(
     authenticate,
     undefined,
@@ -70,6 +72,17 @@ export default function LoginForm() {
         <input type="hidden" name="redirectTo" value={callbackUrl} />
         <Button className="mt-4 w-full" aria-disabled={isPending}>
           Iniciar Sesión <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+        </Button>
+        <Button className="mt-4 w-full bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600" type='button' onClick={() => router.push("/auth/sign-up")} aria-disabled={isPending}>
+          ¿No tienes cuenta? Regístrate <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+        </Button>
+        <Button
+          type="button"
+          onClick={() => router.push("/")}
+          className="mt-4 w-full rounded-md px-4 py-2 text-gray-700 bg-gray-300 hover:bg-gray-200 transition mx-auto active:bg-gray-600"
+        >
+          Cancelar
+          <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
         <div
           className="flex h-8 items-end space-x-1"
