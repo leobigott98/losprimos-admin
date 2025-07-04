@@ -212,9 +212,10 @@ export async function fetchInvoicesPages(query: string) {
 export async function fetchRevenue() {
   try {
     const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query(`
-      SELECT monthname(create_at) AS 'month', SUM(orden_total) AS 'revenue'
+      SELECT dayofmonth(create_at) AS 'day', COUNT(orden_id) AS 'orders'
       FROM ordenes
-      GROUP BY monthname(create_at);`);
+      WHERE create_at > NOW() - INTERVAL 30 DAY
+      GROUP BY dayofmonth(create_at);`);
 
     const revenue: Revenue[] = response as Revenue[] ;
     return(revenue);

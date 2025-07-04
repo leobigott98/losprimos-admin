@@ -82,8 +82,8 @@ export type Usuarios = {
 }
 
 export type Revenue = {
-  month: string;
-  revenue: number;
+  day: string;
+  orders: number;
 };
 
 export type LatestInvoice = {
