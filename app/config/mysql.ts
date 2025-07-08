@@ -5,7 +5,7 @@ const instaceConnectionName = process.env.INSTANCE_CONNECTION_NAME || ''
 
 // connectWithConnector initializes a connection pool for a Cloud SQL instance
 // of MySQL using the Cloud SQL Node.js Connector.
-export const pool = async () => {
+const connectWithConnector = async () => {
   const connector = new Connector();
   const clientOpts = await connector.getOptions({
     instanceConnectionName: instaceConnectionName,
@@ -19,4 +19,6 @@ export const pool = async () => {
   // Establish a connection to the database.
   return mysql.createPool(dbConfig);
 };
+
+export const pool = await connectWithConnector();
 
