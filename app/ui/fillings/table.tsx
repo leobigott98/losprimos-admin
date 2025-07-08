@@ -1,6 +1,7 @@
 import { formatDateToLocal, formatCurrency } from "@/app/lib/utils";
 import { fetchFilteredFillings } from "@/app/lib/data";
 import { toggleFillingAvailability } from "@/app/lib/actions";
+import AvailableButton from "@/app/ui/fillings/available-button";
 
 export default async function FillingsTable({
   query,
@@ -97,7 +98,8 @@ export default async function FillingsTable({
                       : "-"}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    <form
+                    <AvailableButton filling={filling}/>
+                    {/* <form
                       action={async () => {
                         "use server";
                         await toggleFillingAvailability(
@@ -116,7 +118,7 @@ export default async function FillingsTable({
                       >
                         {filling.sabor_disponible ? "Disponible" : "Agotado"}
                       </button>
-                    </form>
+                    </form> */}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
