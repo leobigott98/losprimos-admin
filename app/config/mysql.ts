@@ -1,22 +1,15 @@
 import mysql from 'mysql2/promise'
-import { Connector } from '@google-cloud/cloud-sql-connector';
+import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector';
 
-// connectWithConnector initializes a connection pool for a Cloud SQL instance
-// of MySQL using the Cloud SQL Node.js Connector.
-const connectWithConnector = async () => {
-  const connector = new Connector();
-  const clientOpts = await connector.getOptions({
-    instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME as string,
-  });
-  const dbConfig = {
-    ...clientOpts,
-    user: process.env.MYSQL_USER, // e.g. 'my-db-user'
-    password: process.env.MYSQL_PASSWORD, // e.g. 'my-db-password'
-    database: process.env.MYSQL_DB, // e.g. 'my-database'
-  };
-  // Establish a connection to the database.
-  return mysql.createPool(dbConfig);
-};
-
-export const pool = await connectWithConnector();
+const connector = new Connector();
+const clientOpts = await connector.getOptions({
+  instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME as string,
+  ipType: "PUBLIC" as IpAddressTypes,
+});
+export const pool = mysql.createPool({
+  ...clientOpts,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DB,
+});
 
