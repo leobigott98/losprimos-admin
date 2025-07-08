@@ -1,14 +1,12 @@
 import mysql from 'mysql2/promise'
 import { Connector } from '@google-cloud/cloud-sql-connector';
 
-const instaceConnectionName = process.env.INSTANCE_CONNECTION_NAME || ''
-
 // connectWithConnector initializes a connection pool for a Cloud SQL instance
 // of MySQL using the Cloud SQL Node.js Connector.
 const connectWithConnector = async () => {
   const connector = new Connector();
   const clientOpts = await connector.getOptions({
-    instanceConnectionName: instaceConnectionName,
+    instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME as string,
   });
   const dbConfig = {
     ...clientOpts,
