@@ -26,7 +26,7 @@ export default function Logo({
         <Image
           src={horizontal}
           alt={alt}
-          className="object-contain md:hidden"
+          className="block object-contain md:hidden"
           width={500}
           height={500}
         />
