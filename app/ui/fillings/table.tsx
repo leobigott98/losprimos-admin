@@ -31,17 +31,19 @@ export default async function FillingsTable({
                       {filling.sabor_categoria}
                     </p>
                   </div>
-                  {/* <InvoiceStatus status={filling.sabor_disponible} /> */}
+                  <AvailableButton filling={filling}/>
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
                     <p className="text-xl font-medium">
-                      {formatDateToLocal(filling.creado)}
-                    </p>
-                    <p>
                       {filling.actualizado !== null
                         ? formatDateToLocal(filling.actualizado)
                         : "-"}
+                    </p>
+                    <p>
+                      {/* {filling.actualizado !== null
+                        ? formatDateToLocal(filling.actualizado)
+                        : "-"} */}
                     </p>
                   </div>
                   <div className="flex justify-end gap-2">
