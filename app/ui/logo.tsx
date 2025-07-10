@@ -27,12 +27,16 @@ export default function Logo({
           src={horizontal}
           alt={alt}
           className="object-contain md:hidden"
+          width={500}
+          height={500}
         />
         {/* Desktop (vertical) */}
         <Image
           src={vertical}
           alt={alt}
           className="hidden object-contain md:block"
+          width={500}
+          height={500}
         />
       </div>
     </Link>
