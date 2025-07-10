@@ -7,6 +7,23 @@ export const authConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
+      const path = nextUrl.pathname;
+
+    // Skip auth for static files
+    if (
+      path.startsWith('/_next') ||
+      path.endsWith('.jpg') ||
+      path.endsWith('.jpeg') ||
+      path.endsWith('.png') ||
+      path.endsWith('.webp') ||
+      path.endsWith('.ico') ||
+      path.endsWith('.svg') ||
+      path.endsWith('.js') ||
+      path.endsWith('.css')
+    ) {
+      return true;
+    }
+    // Auth logic
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
       if (isOnDashboard) {
