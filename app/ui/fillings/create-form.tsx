@@ -1,14 +1,23 @@
+'use client'
+
 import Link from 'next/link';
 import {
   TagIcon,
-  PencilIcon
+  PencilIcon,
+  ExclamationCircleIcon
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 import { createFilling } from '@/app/lib/actions';
+import { useActionState } from 'react';
 
 export default function Form() {
+  const [message, formAction, isPending] = useActionState(
+      createFilling,
+      undefined,
+    );
+
   return (
-    <form action={createFilling}>
+    <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -54,6 +63,18 @@ export default function Form() {
             </div>
           </div>
         </div>
+        <div
+          className="flex h-8 items-end space-x-1"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {message && (
+            <>
+              <ExclamationCircleIcon className="h-5 w-5 text-green-500" />
+              <p className="text-sm text-green-500">{message}</p>
+            </>
+          )}
+      </div>
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link

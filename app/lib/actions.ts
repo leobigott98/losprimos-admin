@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { pool } from '../config/mysql';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
-import { FieldPacket, QueryResult } from 'mysql2';
+import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid'
 
@@ -21,21 +21,25 @@ const FillingsFormSchema = z.object({
 
 const CreateFilling = FillingsFormSchema.omit({sabor_id: true, sabor_disponible: true, creado: true, actualizado: true});
 
-export async function createFilling(formData: FormData) {
+export async function createFilling(
+  prevState: string | undefined,
+  formData: FormData
+): Promise<string> {
     const { sabor_nombre, sabor_categoria} = CreateFilling.parse({
         sabor_nombre: formData.get('sabor_nombre'),
         sabor_categoria: formData.get('sabor_categoria'),
     })
 
     try {
-        const response = await pool.query('CALL add_sabor(?, ?)', [sabor_nombre, sabor_categoria]);
-        console.log(response);
+        const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('CALL add_sabor(?, ?)', [sabor_nombre, sabor_categoria]);
+        const result: RowDataPacket = response[0][0];
+        return result.results as string
     } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to create new filling.');
     }
-    revalidatePath('/dashboard/fillings');
-    redirect('/dashboard/fillings');
+    //revalidatePath('/dashboard/fillings');
+    //redirect('/dashboard/fillings');
 }
 
 export async function authenticate(
@@ -112,5 +116,17 @@ export async function toggleFillingAvailability(id: number, currentValue: number
   } catch (error) {
     console.error('DB Error:', error);
     throw new Error('Failed to toggle availability.');
+  }
+}
+
+export async function updateOrderStatus( formData: FormData){
+  const orderNum = formData.get('orderNum') as string;
+  const statusId = formData.get('statusId') as string;
+
+  try {
+    await pool.query('CALL update_ordenes(?, ?)', [orderNum, statusId])
+  } catch (error) {
+    console.error('Order Update Error:', error);
+    throw new Error('Failed to update order status.');
   }
 }

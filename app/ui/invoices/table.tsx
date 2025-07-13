@@ -1,8 +1,7 @@
-import Image from 'next/image';
 import { UpdateInvoice, ViewDetail } from '@/app/ui/invoices/buttons';
-import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredOrders } from '@/app/lib/data';
+import StatusCombo from './status-combo';
 
 export default async function InvoicesTable({
   query,
@@ -30,7 +29,7 @@ export default async function InvoicesTable({
                     </div>
                     <p className="text-sm text-gray-500">{order.phone}</p>
                   </div>
-                  <InvoiceStatus status={order.status} />
+                  <StatusCombo status={order.status_valor} orderNum={order.order_num}/>
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
@@ -112,7 +111,7 @@ export default async function InvoicesTable({
                     {order.payment?? 'pendiente'}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    <InvoiceStatus status={order.status?? 'pending'} />
+                    <StatusCombo status={order.status_valor} orderNum={order.order_num}/>
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">

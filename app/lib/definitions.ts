@@ -51,6 +51,7 @@ export type OrdenesTable = {
   detail: string;
   amount: number;
   status: string | null;
+  status_valor: number;
   payment: string | null;
 } 
 
