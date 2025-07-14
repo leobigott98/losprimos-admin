@@ -1,4 +1,5 @@
 import { lusitana } from '@/app/ui/fonts';
+import { ReactNode } from 'react';
 
 const shimmer =
   'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
@@ -6,9 +7,11 @@ const shimmer =
 export function Card({
   title,
   value,
+  children
 }: {
   title?: string;
   value?: number | string;
+  children?: ReactNode
 }) {
 
   return (
@@ -22,6 +25,9 @@ export function Card({
       >
         {value}
       </p>
+      <div className='rounded-xl bg-white px-4 py-8 m-auto'>
+        {children}
+      </div>
     </div>
   );
 }

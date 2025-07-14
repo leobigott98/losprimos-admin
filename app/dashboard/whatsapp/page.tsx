@@ -10,7 +10,9 @@ export default function Page() {
         Código QR Whatsapp
       </h1>
       <Suspense fallback={<CardSkeleton />}>
-        <Card title="Escanear para iniciar sesión en WhatsApp"/>
+        <Card title="Escanear para iniciar sesión en WhatsApp">
+          <iframe src={process.env.QR_CODE_URL} width={'100%'} height={300}></iframe>
+        </Card>
       </Suspense>
     </div>
   );
