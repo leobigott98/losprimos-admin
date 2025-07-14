@@ -2,6 +2,7 @@ import { UpdateInvoice, ViewDetail } from '@/app/ui/invoices/buttons';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredOrders } from '@/app/lib/data';
 import StatusCombo from './status-combo';
+import { OrdenesTable } from '@/app/lib/definitions';
 
 export default async function InvoicesTable({
   query,
@@ -10,7 +11,7 @@ export default async function InvoicesTable({
   query: string;
   currentPage: number;
 }) {
-  const orders = await fetchFilteredOrders(query, currentPage);
+  const orders: OrdenesTable[] = await fetchFilteredOrders(query, currentPage);
 
   return (
     <div className="mt-6 flow-root">

@@ -169,9 +169,10 @@ export async function fetchOrdersPages(query: string) {
 export async function fetchOrderById(id: string) {
   try {
     const [response]: [QueryResult, FieldPacket[]] = await pool.query(
-      `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS status, create_at AS created_at 
+      `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS payment, p_status.status_nombre AS status, ordenes.status_valor, create_at AS created_at 
       FROM ordenes
       LEFT JOIN clientes ON ordenes.cliente_telefono = clientes.cliente_id
+      LEFT JOIN p_status ON ordenes.status_valor = p_status.status_valor
       WHERE ordenes.orden_id = UUID_TO_BIN(?);`,
       [id]
     );
@@ -216,10 +217,10 @@ export async function fetchInvoicesPages(query: string) {
 export async function fetchRevenue() {
   try {
     const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query(`
-      SELECT dayofmonth(create_at) AS 'day', COUNT(orden_id) AS 'orders'
+      SELECT date_format((create_at), '%h %p')  AS 'hour', COUNT(orden_id) AS 'orders'
       FROM ordenes
-      WHERE create_at > NOW() - INTERVAL 30 DAY
-      GROUP BY dayofmonth(create_at);`);
+      WHERE create_at > NOW() - INTERVAL 1 DAY
+      GROUP BY date_format((create_at), '%h %p');`);
 
     const revenue: Revenue[] = response as Revenue[] ;
     return(revenue);

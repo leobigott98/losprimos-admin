@@ -12,13 +12,16 @@ import {
 import { formatCurrency, formatDateToLocal } from '@/app/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
+import StatusCombo from './status-combo';
 
-export default function EditInvoiceForm({
+export default function Form({
   order
 }: {
   order: OrdenesTable;
 }) {
   //const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
+
+  console.log(order.status_valor, order.order_num)
 
   return (
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
@@ -106,7 +109,8 @@ export default function EditInvoiceForm({
             Estatus de la orden
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-            <div className="flex gap-4">
+            <StatusCombo status={order.status_valor} orderNum={order.order_num}/>
+            {/* <div className="flex gap-4">
               <div className="flex items-center">
                 <input
                   id="pending"
@@ -139,7 +143,7 @@ export default function EditInvoiceForm({
                   Pagado <CheckIcon className="h-4 w-4" />
                 </label>
               </div>
-            </div>
+            </div> */}
           </div>
         </fieldset>
       {/* </div> */}

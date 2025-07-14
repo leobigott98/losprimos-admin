@@ -7,6 +7,14 @@ export const formatCurrency = (amount: number) => {
   });
 };
 
+export const formatHourLabel = (hour24: number): string => {
+  const period = hour24 < 12 ? 'AM' : 'PM';
+  let hour12 = hour24 % 12;
+  if (hour12 === 0) hour12 = 12;
+  return `${hour12 < 10 ? '0' + hour12 : hour12} ${period}`;
+}
+
+
 export const formatDateToLocal = (
   dateStr: string | Date,
   locale: string = 'en-US',
@@ -31,7 +39,7 @@ export const generateYAxis = (revenue: Revenue[]) => {
   const highestRecord = Math.max(...revenue.map((month) => month.orders));
   const topLabel = Math.ceil(highestRecord);
 
-  for (let i = topLabel; i >= 0; i -= 1000) {
+  for (let i = topLabel; i >= 0; i -= 4) {
     yAxisLabels.push(`${i}`);
   }
 

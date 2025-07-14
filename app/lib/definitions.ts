@@ -85,7 +85,7 @@ export type Usuarios = {
 }
 
 export type Revenue = {
-  day: string;
+  hour: string;
   orders: number;
 };
 
