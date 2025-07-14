@@ -53,6 +53,7 @@ export type OrdenesTable = {
   status: string | null;
   status_valor: number;
   payment: string | null;
+  image: string | null;
 } 
 
 export type Sabores = {
