@@ -2,7 +2,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function POST(request: Request){
     revalidatePath('/dashboard/invoices');
-    revalidatePath('/dashboard')
+    revalidatePath('/dashboard');
 
     return new Response(JSON.stringify({ message: 'Pages revalidated successfully!' }), {
         status: 201,

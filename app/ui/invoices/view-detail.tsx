@@ -95,6 +95,7 @@ export default function Form({
         </div>
 
         {/* Payment Info */}
+        { order.payment === 'Pago Movil' ? (
         <div className="mb-4">
           <h2 className="mb-2 block text-sm font-medium">
             Detalle de Pago
@@ -102,8 +103,8 @@ export default function Form({
           <div className="relative mt-2 rounded-md">
                 <Image alt={`Comprobante Pago Móvil Orden ${order.order_num}`} src={`${process.env.PAYMENT_IMG_URL}/${order.image}`} width={300} height={600} className='mx-auto rounded-md'/>
           </div>
-        </div>
-
+        </div>) : <></>
+        }
         {/* Invoice Status */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">

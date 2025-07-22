@@ -12,6 +12,7 @@ export const authConfig = {
     // Skip auth for static files
     if (
       path.startsWith('/_next') ||
+      path.startsWith('/api') ||
       path.endsWith('.jpg') ||
       path.endsWith('.jpeg') ||
       path.endsWith('.png') ||

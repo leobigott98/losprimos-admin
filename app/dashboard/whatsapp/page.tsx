@@ -11,7 +11,7 @@ export default function Page() {
       </h1>
       <Suspense fallback={<CardSkeleton />}>
         <Card title="Escanear para iniciar sesión en WhatsApp">
-          <iframe src={process.env.QR_CODE_URL} width={'100%'} height={300}></iframe>
+          <iframe src={process.env.QR_CODE_URL} width={'100%'} height={460}></iframe>
         </Card>
       </Suspense>
     </div>

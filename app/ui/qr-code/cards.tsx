@@ -1,33 +1,38 @@
-import { lusitana } from '@/app/ui/fonts';
-import { ReactNode } from 'react';
+import { lusitana } from "@/app/ui/fonts";
+import { ReactNode } from "react";
 
 const shimmer =
-  'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
+  "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent";
 
 export function Card({
   title,
   value,
-  children
+  children,
 }: {
   title?: string;
   value?: number | string;
-  children?: ReactNode
+  children?: ReactNode;
 }) {
-
   return (
     <div className="rounded-xl bg-gray-50 p-2 shadow-sm">
       <div className="flex p-4">
         <h3 className="ml-2 text-sm font-medium">{title}</h3>
       </div>
-      <p
-        className={`${lusitana.className}
+      {value ? (
+        <p
+          className={`${lusitana.className}
           truncate rounded-xl bg-white px-4 py-8 text-center text-2xl`}
-      >
-        {value}
-      </p>
-      <div className='rounded-xl bg-white px-4 py-8 m-auto'>
-        {children}
-      </div>
+        >
+          {value}
+        </p>
+      ) : (
+        <></>
+      )}
+      {children ? (
+        <div className="rounded-xl bg-white px-4 py-8 mx-auto">{children}</div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

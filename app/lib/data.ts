@@ -219,7 +219,7 @@ export async function fetchRevenue() {
     const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query(`
       SELECT date_format((create_at), '%h %p')  AS 'hour', COUNT(orden_id) AS 'orders'
       FROM ordenes
-      WHERE create_at > NOW() - INTERVAL 1 DAY
+      WHERE create_at > NOW() - INTERVAL 60 DAY
       GROUP BY date_format((create_at), '%h %p');`);
 
     const revenue: Revenue[] = response as Revenue[] ;
