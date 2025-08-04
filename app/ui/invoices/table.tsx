@@ -19,7 +19,7 @@ export default function Table({ query, currentPage }: { query: string; currentPa
   }, [setAudio])
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3001');
+    const ws = new WebSocket(`ws://${process.env.WS_URL}`);
 
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
