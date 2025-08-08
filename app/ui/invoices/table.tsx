@@ -19,8 +19,8 @@ export default function Table({ query, currentPage }: { query: string; currentPa
   }, [setAudio])
 
   useEffect(() => {
-    const ws = new WebSocket(`${process.env.WS_URL}`);
-
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}`);
+    
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
       if (msg.type === 'newOrder') {
