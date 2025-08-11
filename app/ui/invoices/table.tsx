@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import useSWR, { Fetcher, mutate } from 'swr';
+import useSWR, { Fetcher } from 'swr';
+import useOrdersWS from '@/app/hooks/useOrderWs';
 import { ViewDetail } from '@/app/ui/invoices/buttons';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import StatusCombo from './status-combo';
@@ -14,26 +15,14 @@ export default function Table({ query, currentPage }: { query: string; currentPa
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const { data: orders, error, isLoading } =  useSWR<OrdenesTable[]>(`/api/orders?query=${query}&page=${currentPage}`, fetcher);
 
-  useEffect(()=>{
-    setAudio(new Audio('/new-notification-011-364050.mp3'));
-  }, [setAudio])
-
   useEffect(() => {
-    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}`);
-    
-    ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      if (msg.type === 'newOrder') {
-        mutate(`/api/orders?query=${query}&page=${currentPage}`);
-        if (audio){
-          console.log(audio);
-          audio.play();
-        }
-      }
-    };
+    setAudio(new Audio('/new-notification-011-364050.mp3'));
+  }, []);
 
-    return () => ws.close();
-  }, [query, currentPage]);
+  useOrdersWS({ query, currentPage, onNewOrderAudio: audio });
+
+  if (error) return <div>Failed to load data</div>;
+  if (isLoading) return <div>Loading...</div>;
 
   if (error) return <div>Failed to load data</div>
   if (isLoading) return <div>Loading...</div>;
