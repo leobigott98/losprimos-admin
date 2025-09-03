@@ -10,6 +10,25 @@ import { Button } from '@/app/ui/button';
 import { createFilling } from '@/app/lib/actions';
 import { useActionState } from 'react';
 
+const categoriasSabores = [
+  {
+    label: 'normal',
+    value: 'normal'
+  },
+  {
+    label: 'mar',
+    value: 'mar'
+  },
+  {
+    label: 'refresco',
+    value: 'refresco'
+  },
+  {
+    label: 'lipton',
+    value: 'lipton'
+  },
+]
+
 export default function Form() {
   const [message, formAction, isPending] = useActionState(
       createFilling,
@@ -34,12 +53,13 @@ export default function Form() {
               <option value="" disabled>
                 Elige una categoría
               </option>
-              <option key='normal' value='normal'>
-                normal
-              </option>
-              <option key='mar' value='mar'>
-                mar
-              </option>
+              {categoriasSabores.map((categoria)=>{
+                return(
+                  <option key={categoria.value} value={categoria.value}>
+                    {categoria.label}
+                  </option>
+                )
+              })}
             </select>
             <TagIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
@@ -78,7 +98,7 @@ export default function Form() {
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/invoices"
+          href="/dashboard/fillings"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancelar
