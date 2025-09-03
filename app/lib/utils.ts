@@ -27,7 +27,7 @@ export const formatDateToLocal = (
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    timeZone: 'America/Caracas'
+    timeZone: 'GMT'
   };
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
