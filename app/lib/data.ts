@@ -257,10 +257,10 @@ export async function fetchCardData() {
     const invoiceCountPromise: Promise<[RowDataPacket[], FieldPacket[]]> = pool.query('SELECT COUNT(*) AS count FROM ordenes;');
     const customerCountPromise: Promise<[RowDataPacket[], FieldPacket[]]> = pool.query('SELECT COUNT(*) AS count FROM clientes;');
     const invoiceStatusPromise: Promise<[RowDataPacket[], FieldPacket[]]> = pool.query(`SELECT 
-	SUM(CASE WHEN orden_status = 'pagado' THEN orden_total ELSE 0 END) AS 'pagado',
+	SUM(CASE WHEN p_status.status_nombre = 'Orden Facturada' THEN orden_total ELSE 0 END) AS 'facturado',
     SUM(CASE WHEN orden_status = 'Pago Efectivo' THEN orden_total ELSE 0 END) AS 'efectivo',
-    SUM(CASE WHEN orden_status != 'Pago Efectivo' AND orden_status != 'pagado' THEN orden_total ELSE 0 END) AS 'pendiente'
-FROM ordenes;`);
+    SUM(CASE WHEN p_status.status_nombre = 'Orden Recibida' THEN orden_total ELSE 0 END) AS 'pendiente'
+FROM ordenes LEFT JOIN p_status ON ordenes.status_valor = p_status.status_valor;`);
 
     const [invoiceData, customerData, statusData] = await Promise.all([
       invoiceCountPromise,
@@ -270,7 +270,7 @@ FROM ordenes;`);
 
     const numberOfInvoices = Number(invoiceData[0][0].count ?? '0');
     const numberOfCustomers = Number(customerData[0][0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(statusData[0][0].pagado ?? '0');
+    const totalPaidInvoices = formatCurrency(statusData[0][0].facturado ?? '0');
     const totalCashInvoices = formatCurrency(statusData[0][0].efectivo ?? '0');
     const totalPendingInvoices = formatCurrency(statusData[0][0].pendiente ?? '0');
 

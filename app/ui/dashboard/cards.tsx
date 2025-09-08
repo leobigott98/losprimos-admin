@@ -24,7 +24,7 @@ export default async function CardWrapper() {
     <>
       {/* NOTE: Uncomment this code in Chapter 9 */}
 
-      <Card title="Pagado" value={totalPaidInvoices} type="collected" />
+      <Card title="Facturado" value={totalPaidInvoices} type="collected" />
       <Card title="Efectivo" value={totalCashInvoices} type="cash" />
       <Card title="Pendiente" value={totalPendingInvoices} type="pending" />
       <Card title="Total de Órdenes" value={numberOfInvoices} type="invoices" />
