@@ -95,7 +95,7 @@ export default function Form({
         </div>
 
         {/* Payment Info */}
-        { order.payment === 'Pago Movil' || 'Efectivo'? (
+        { order.payment === 'Pago Movil' || order.payment === 'Pago Efectivo' || order.payment === 'Efectivo'? (
         <div className="mb-4">
           <h2 className="mb-2 block text-sm font-medium">
             Detalle de Pago
