@@ -14,7 +14,7 @@ const FillingsFormSchema = z.object({
     sabor_id: z.number(),
     sabor_nombre: z.string(),
     sabor_disponible: z.number(),
-    sabor_categoria: z.enum(['normal', 'mar']),
+    sabor_categoria: z.enum(['normal', 'mar', 'refresco', 'lipton']),
     creado: z.date(),
     actualizado: z.date(),
 })

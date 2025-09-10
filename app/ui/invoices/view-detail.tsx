@@ -95,13 +95,13 @@ export default function Form({
         </div>
 
         {/* Payment Info */}
-        { order.payment === 'Pago Movil' ? (
+        { order.payment === 'Pago Movil' || 'Efectivo'? (
         <div className="mb-4">
           <h2 className="mb-2 block text-sm font-medium">
             Detalle de Pago
           </h2>
           <div className="relative mt-2 rounded-md">
-                <Image alt={`Comprobante Pago Móvil Orden ${order.order_num}`} src={`${process.env.PAYMENT_IMG_URL}/${order.image}`} width={300} height={600} className='mx-auto rounded-md'/>
+                <Image alt={`Comprobante de Pago Orden ${order.order_num}`} src={`${process.env.PAYMENT_IMG_URL}/${order.image}`} width={300} height={600} className='mx-auto rounded-md'/>
           </div>
         </div>) : <></>
         }
