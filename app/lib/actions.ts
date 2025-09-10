@@ -36,7 +36,8 @@ export async function createFilling(
         return result.results as string
     } catch (error) {
         console.error('Database Error:', error);
-        throw new Error('Failed to create new filling.');
+        return 'Fallo del sistema'
+        //throw new Error('Failed to create new filling.');
     }
     //revalidatePath('/dashboard/fillings');
     //redirect('/dashboard/fillings');
