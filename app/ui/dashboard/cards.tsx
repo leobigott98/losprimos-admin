@@ -2,37 +2,33 @@ export const dynamic = 'force-dynamic';
 
 import {
   BanknotesIcon,
-  ClockIcon,
-  UserGroupIcon,
-  InboxIcon,
-  ReceiptPercentIcon
+  DevicePhoneMobileIcon,
+  ArchiveBoxXMarkIcon,
+  ReceiptPercentIcon, 
+  CreditCardIcon
 } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchCardData } from '@/app/lib/data';
 
 const iconMap = {
-  collected: ReceiptPercentIcon,
-  customers: UserGroupIcon,
-  pending: ClockIcon,
-  invoices: InboxIcon,
+  total: ReceiptPercentIcon,
+  pm: DevicePhoneMobileIcon,
+  pos: CreditCardIcon,
+  cancelled: ArchiveBoxXMarkIcon,
   cash: BanknotesIcon
 };
 
 export default async function CardWrapper() {
-  const { totalPaidInvoices, totalPendingInvoices, numberOfInvoices, numberOfCustomers, totalCashInvoices} = await fetchCardData();
+  const { totalCashInvoices, totalPmInvoices, totalPosInvoices, totalInvoices, cancelled} = await fetchCardData();
   return (
     <>
       {/* NOTE: Uncomment this code in Chapter 9 */}
 
-      <Card title="Facturado" value={totalPaidInvoices} type="collected" />
+      <Card title="Total" value={totalInvoices} type="total" />
       <Card title="Efectivo" value={totalCashInvoices} type="cash" />
-      <Card title="Pendiente" value={totalPendingInvoices} type="pending" />
-      <Card title="Total de Órdenes" value={numberOfInvoices} type="invoices" />
-      <Card
-        title="Total de Clientes"
-        value={numberOfCustomers}
-        type="customers"
-      />
+      <Card title="Pago Móvil" value={totalPmInvoices} type="pm" />
+      <Card title="Punto de Venta" value={totalPosInvoices} type="pos" />
+      <Card title="Canceladas" value={cancelled} type="cancelled" />
     </>
   );
 }
@@ -44,7 +40,7 @@ export function Card({
 }: {
   title: string;
   value: number | string;
-  type: 'invoices' | 'customers' | 'pending' | 'collected' | 'cash';
+  type: 'total' | 'cash' | 'pm' | 'pos' | 'cancelled';
 }) {
   const Icon = iconMap[type];
 

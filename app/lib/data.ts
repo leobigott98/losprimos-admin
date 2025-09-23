@@ -1,4 +1,4 @@
-import { pool } from '../config/mysql';
+import { pool } from "../config/mysql";
 import {
   ClienteTable,
   LatestInvoice,
@@ -6,36 +6,35 @@ import {
   OrdenesTable,
   Revenue,
   Sabores,
-} from './definitions';
-import {
-  Cliente,
-  Ordenes
-} from './definitions'
-import { FieldPacket, QueryResult, RowDataPacket } from 'mysql2'
+} from "./definitions";
+import { Cliente, Ordenes } from "./definitions";
+import { FieldPacket, QueryResult, RowDataPacket } from "mysql2";
 
-import { formatCurrency } from './utils';
+import { formatCurrency } from "./utils";
 
 const ITEMS_PER_PAGE = 10;
 
 // Fetch customers
 export async function fetchClientes() {
-  try{
-    const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('call get_clientes()');
+  try {
+    const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query(
+      "call get_clientes()"
+    );
     const customers: Cliente[] = response[0] as Cliente[];
-    return(customers);
-  } catch (error){
+    return customers;
+  } catch (error) {
     console.log(error);
-    throw new Error('Failed to fetch customers');
+    throw new Error("Failed to fetch customers");
   }
 }
 
 export async function fetchFilteredClientes(
   query: string,
-  currentPage: number,
-){
+  currentPage: number
+) {
   try {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-    const searchTerm = `%${query.toLowerCase()}%`
+    const searchTerm = `%${query.toLowerCase()}%`;
     const [response]: [QueryResult, FieldPacket[]] = await pool.query(
       `SELECT SUM(orden_total) AS 'total_paid', cliente_telefono AS 'phone', COUNT(orden_id) AS 'n_orders', cliente_nombre, clientes.creado AS created_at 
       FROM ordenes
@@ -50,10 +49,10 @@ export async function fetchFilteredClientes(
       [searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
     );
     const customers: ClienteTable[] = response as ClienteTable[];
-    return(customers);
+    return customers;
   } catch (error) {
     console.log(error);
-    throw new Error('Failed to fetch filtered customers')
+    throw new Error("Failed to fetch filtered customers");
   }
 }
 
@@ -73,38 +72,37 @@ export async function fetchClientesPages(query: string) {
         )
         GROUP BY cliente_telefono
         ORDER BY created_at DESC
-        ) n_clientes ;`, 
+        ) n_clientes ;`,
       [searchTerm, searchTerm, searchTerm]
     );
 
     const totalRows = rows[0].total as number;
     const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
-    return totalPages; 
+    return totalPages;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of customers.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch total number of customers.");
   }
 }
 
 // Fetch orders
 export async function fetchOrders() {
-  try{
-    const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('call get_ordenes()');
+  try {
+    const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query(
+      "call get_ordenes()"
+    );
     const orders: Ordenes[] = response[0] as Ordenes[];
-    return(orders);
-  } catch (error){
+    return orders;
+  } catch (error) {
     console.log(error);
-    throw new Error('Failed to fetch orders');
+    throw new Error("Failed to fetch orders");
   }
 }
 
-export async function fetchFilteredOrders(
-  query: string,
-  currentPage: number
-){
+export async function fetchFilteredOrders(query: string, currentPage: number) {
   try {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-    const searchTerm = `%${query.toLowerCase()}%`
+    const searchTerm = `%${query.toLowerCase()}%`;
     const [response]: [QueryResult, FieldPacket[]] = await pool.query(
       `SELECT BIN_TO_UUID(ordenes.orden_id) AS id, clientes.cliente_nombre AS name, orden_num AS order_num, cliente_telefono AS phone, orden_detalle AS detail, orden_total AS amount, orden_status AS payment, p_status.status_nombre AS status, ordenes.status_valor, create_at AS created_at 
       FROM ordenes
@@ -124,13 +122,24 @@ export async function fetchFilteredOrders(
       )
       ORDER BY ordenes.create_at DESC
       LIMIT ? OFFSET ?;`,
-      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
+      [
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        ITEMS_PER_PAGE,
+        offset,
+      ]
     );
     const orders: OrdenesTable[] = response as OrdenesTable[];
-    return(orders);
+    return orders;
   } catch (error) {
     console.log(error);
-    throw new Error('Failed to fetch filtered customers')
+    throw new Error("Failed to fetch filtered customers");
   }
 }
 
@@ -153,16 +162,24 @@ export async function fetchOrdersPages(query: string) {
         LOWER(created_at) LIKE ? 
       )
       ORDER BY created_at DESC
-        ) n_clientes ;`, 
-      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]
+        ) n_clientes ;`,
+      [
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+      ]
     );
 
     const totalRows = rows[0].total as number;
     const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
-    return totalPages; 
+    return totalPages;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of customers.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch total number of customers.");
   }
 }
 
@@ -177,11 +194,11 @@ export async function fetchOrderById(id: string) {
       [id]
     );
 
-    const order: OrdenesTable[] = response as OrdenesTable[] ;
-    return(order);
+    const order: OrdenesTable[] = response as OrdenesTable[];
+    return order;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch order.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch order.");
   }
 }
 
@@ -201,16 +218,24 @@ export async function fetchInvoicesPages(query: string) {
         LOWER(ordenes.orden_status) LIKE ? OR
         LOWER(ordenes.orden_num) LIKE ? OR
         LOWER(ordenes.orden_detalle) LIKE ?
-      )`, 
-      [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]
+      )`,
+      [
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+        searchTerm,
+      ]
     );
 
     const totalRows = rows[0].total as number;
     const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
-    return totalPages; 
+    return totalPages;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch total number of invoices.");
   }
 }
 
@@ -222,11 +247,11 @@ export async function fetchRevenue() {
       WHERE create_at > NOW() - INTERVAL 60 DAY
       GROUP BY date_format((create_at), '%h %p');`);
 
-    const revenue: Revenue[] = response as Revenue[] ;
-    return(revenue);
+    const revenue: Revenue[] = response as Revenue[];
+    return revenue;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch revenue data.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch revenue data.");
   }
 }
 
@@ -247,65 +272,69 @@ export async function fetchLatestInvoices() {
     }));
     return latestInvoices;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch the latest invoices.");
   }
 }
 
 export async function fetchCardData() {
   try {
-    const invoiceCountPromise: Promise<[RowDataPacket[], FieldPacket[]]> = pool.query('SELECT COUNT(*) AS count FROM ordenes;');
-    const customerCountPromise: Promise<[RowDataPacket[], FieldPacket[]]> = pool.query('SELECT COUNT(*) AS count FROM clientes;');
-    const invoiceStatusPromise: Promise<[RowDataPacket[], FieldPacket[]]> = pool.query(`SELECT 
-	SUM(CASE WHEN p_status.status_nombre = 'Orden Facturada' THEN orden_total ELSE 0 END) AS 'facturado',
-    SUM(CASE WHEN orden_status = 'Pago Efectivo' THEN orden_total ELSE 0 END) AS 'efectivo',
-    SUM(CASE WHEN p_status.status_nombre = 'Orden Recibida' THEN orden_total ELSE 0 END) AS 'pendiente'
-FROM ordenes LEFT JOIN p_status ON ordenes.status_valor = p_status.status_valor;`);
+    const invoiceStatusPromise: Promise<[RowDataPacket[], FieldPacket[]]> =
+      pool.query(`SELECT 
+	SUM(CASE WHEN ordenes.orden_status = 'Pago Efectivo' OR orden_status = 'Efectivo' THEN orden_total ELSE 0 END) AS 'efectivo',
+    SUM(CASE WHEN ordenes.orden_status = 'Pago Movil' THEN orden_total ELSE 0 END) AS 'pago_movil',
+    SUM(CASE WHEN ordenes.orden_status = 'Punto de venta' THEN orden_total ELSE 0 END) AS 'punto_venta',
+    SUM(ordenes.orden_total) AS 'total'
+    FROM ordenes LEFT JOIN p_status ON ordenes.status_valor = p_status.status_valor;`);
+    const cancelledOrdersPromise: Promise<[RowDataPacket[], FieldPacket[]]> = 
+        pool.query(`SELECT COUNT(ordenes.orden_id) AS 'canceladas'
+          FROM ordenes LEFT JOIN p_status ON ordenes.status_valor = p_status.status_valor
+          WHERE p_status.status_nombre = 'Orden Cancelada';`);
 
-    const [invoiceData, customerData, statusData] = await Promise.all([
-      invoiceCountPromise,
-      customerCountPromise,
-      invoiceStatusPromise,
-    ]);
+    const [statusData, cancelledOrders] = await Promise.all([
+      invoiceStatusPromise, 
+      cancelledOrdersPromise]);
 
-    const numberOfInvoices = Number(invoiceData[0][0].count ?? '0');
-    const numberOfCustomers = Number(customerData[0][0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(statusData[0][0].facturado ?? '0');
-    const totalCashInvoices = formatCurrency(statusData[0][0].efectivo ?? '0');
-    const totalPendingInvoices = formatCurrency(statusData[0][0].pendiente ?? '0');
+    const totalCashInvoices = formatCurrency(statusData[0][0].efectivo ?? "0");
+    const totalPmInvoices = formatCurrency(statusData[0][0].pago_movil ?? "0");
+    const totalPosInvoices = formatCurrency(statusData[0][0].punto_venta ?? "0");
+    const totalInvoices = formatCurrency(statusData[0][0].total ?? "0");
+    const cancelled = cancelledOrders[0][0].canceladas ?? "0";
 
     return {
-      numberOfCustomers,
-      numberOfInvoices,
-      totalPaidInvoices,
       totalCashInvoices,
-      totalPendingInvoices
+      totalPmInvoices,
+      totalPosInvoices,
+      totalInvoices,
+      cancelled,
     };
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch card data.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch card data.");
   }
 }
 
 // Fetch fillings
 export async function fetchFillings() {
-  try{
-    const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query('SELECT * FROM sabores;');
+  try {
+    const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      "SELECT * FROM sabores;"
+    );
     const fillings: Sabores[] = response[0] as Sabores[];
-    return(fillings);
-  } catch (error){
+    return fillings;
+  } catch (error) {
     console.log(error);
-    throw new Error('Failed to fetch fillings');
+    throw new Error("Failed to fetch fillings");
   }
 }
 
 export async function fetchFilteredFillings(
   query: string,
-  currentPage: number,
-){
+  currentPage: number
+) {
   try {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-    const searchTerm = `%${query.toLowerCase()}%`
+    const searchTerm = `%${query.toLowerCase()}%`;
     const [response]: [QueryResult, FieldPacket[]] = await pool.query(
       `SELECT * 
       FROM sabores
@@ -318,10 +347,10 @@ export async function fetchFilteredFillings(
       [searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
     );
     const fillings: Sabores[] = response as Sabores[];
-    return(fillings);
+    return fillings;
   } catch (error) {
     console.log(error);
-    throw new Error('Failed to fetch filtered fillings')
+    throw new Error("Failed to fetch filtered fillings");
   }
 }
 
@@ -336,15 +365,15 @@ export async function fetchFillingsPages(query: string) {
        WHERE (
         LOWER(sabor_nombre) LIKE ? OR
         LOWER(sabor_categoria) LIKE ?
-      )) n_fillings ;`, 
+      )) n_fillings ;`,
       [searchTerm, searchTerm]
     );
 
     const totalRows = rows[0].total as number;
     const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
-    return totalPages; 
+    return totalPages;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of customers.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch total number of customers.");
   }
 }
