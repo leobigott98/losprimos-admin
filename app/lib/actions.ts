@@ -43,6 +43,40 @@ export async function createFilling(
     //redirect('/dashboard/fillings');
 }
 
+const DeliveryZonesFormSchema = z.object({
+    zona_id: z.number(),
+    zona_nombre: z.string(),
+    zona_cod: z.string(),
+    zona_precio: z.number(),
+    status_valor: z.enum(['1', '2']),
+    create_at: z.date(),
+    actualizado: z.date(),
+})
+
+const CreateDeliveryZone = DeliveryZonesFormSchema.omit({zona_id: true, zona_cod: true, create_at: true, actualizado: true, status_valor: true});
+
+export async function createDeliveryZone(
+  prevState: string | undefined,
+  formData: FormData
+): Promise<string> {
+    const { zona_nombre, zona_precio} = CreateDeliveryZone.parse({
+        zona_nombre: formData.get('zona_nombre'),
+        zona_precio: formData.get('zona_precio'),
+    })
+
+    try {
+        const [response]: [RowDataPacket[][], FieldPacket[]] = await pool.query('CALL add_zona(?, ?)', [zona_nombre, zona_precio]);
+        const result: RowDataPacket = response[0][0];
+        return result.results as string
+    } catch (error) {
+        console.error('Database Error:', error);
+        return 'Fallo del sistema'
+        //throw new Error('Failed to create new filling.');
+    }
+    //revalidatePath('/dashboard/fillings');
+    //redirect('/dashboard/fillings');
+}
+
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
@@ -117,6 +151,17 @@ export async function toggleFillingAvailability(id: number, currentValue: number
   } catch (error) {
     console.error('DB Error:', error);
     throw new Error('Failed to toggle availability.');
+  }
+}
+
+export async function toggleDeliveryZoneStatus(id: number, currentValue: number) {
+  try {
+    const newValue = currentValue === 1 ? 2 : 1;
+    await pool.query('UPDATE p_zonas SET status_valor = ?, actualizado = (NOW() - INTERVAL 240 MINUTE) WHERE zona_id = ?', [newValue, id]);
+    revalidatePath('/dashboard/delivery'); // Refresh table
+  } catch (error) {
+    console.error('DB Error:', error);
+    throw new Error('Failed to toggle status.');
   }
 }
 

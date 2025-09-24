@@ -65,6 +65,16 @@ export type Sabores = {
   actualizado: Date | null;
 }
 
+export type Zonas = {
+  zona_id: number;
+  zona_cod: string;
+  zona_nombre: string;
+  zona_precio: number;
+  status_valor: number;
+  create_at: Date;
+  actualizado: Date | null;
+}
+
 export type Status = {
   status_id: number;
   status_tipo: string;

@@ -6,6 +6,7 @@ import {
   OrdenesTable,
   Revenue,
   Sabores,
+  Zonas,
 } from "./definitions";
 import { Cliente, Ordenes } from "./definitions";
 import { FieldPacket, QueryResult, RowDataPacket } from "mysql2";
@@ -434,5 +435,95 @@ export async function fetchFillingsPages(query?: string, category?: string, stat
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch total number of customers.");
+  }
+}
+// Fetch fillings
+export async function fetchDeliveryZones() {
+  try {
+    const [response]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      "SELECT * FROM p_zonas;"
+    );
+    const zonas: Zonas[] = response[0] as Zonas[];
+    return zonas;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to fetch fillings");
+  }
+}
+
+export async function fetchFilteredDeliveryZones(
+  query: string,
+  currentPage: number,
+) {
+  try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+    const params: any[] = [];
+    const conditions: string[] = [];
+
+    // Base search term (for name/codebot)
+    if (query) {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      conditions.push(
+        `(LOWER(zona_nombre) LIKE ? OR LOWER(zona_cod) LIKE ?)`
+      );
+      params.push(searchTerm, searchTerm);
+    }
+
+    // Build final WHERE clause
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    // Add pagination
+    params.push(ITEMS_PER_PAGE, offset);
+
+    const [response]: [QueryResult, FieldPacket[]] = await pool.query(
+      `
+      SELECT * 
+      FROM p_zonas
+      ${whereClause}
+      ORDER BY create_at DESC
+      LIMIT ? OFFSET ?;
+      `,
+      params
+    );
+
+    return response as Zonas[];
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to fetch filtered delivery zones");
+  }
+}
+
+
+export async function fetchDeliveryZonesPages(query?: string) {
+  try {
+    const params: any[] = [];
+    const conditions: string[] = [];
+
+    // Base search term (for name/codebot)
+    if (query) {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      conditions.push(
+        `(LOWER(zona_nombre) LIKE ? OR LOWER(zona_cod) LIKE ?)`
+      );
+      params.push(searchTerm, searchTerm);
+    }
+
+    // Build final WHERE clause
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM (
+        SELECT * 
+      FROM p_zonas
+       ${whereClause}) n_zones ;`,
+      params
+    );
+
+    const totalRows = rows[0].total as number;
+    const totalPages = Math.ceil(totalRows / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch total number of delivery zones");
   }
 }
