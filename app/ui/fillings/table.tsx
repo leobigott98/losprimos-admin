@@ -6,11 +6,15 @@ import AvailableButton from "@/app/ui/fillings/available-button";
 export default async function FillingsTable({
   query,
   currentPage,
+  category,
+  status
 }: {
   query: string;
   currentPage: number;
+  category?: string;
+  status?: string
 }) {
-  const fillings = await fetchFilteredFillings(query, currentPage);
+  const fillings = await fetchFilteredFillings(query, currentPage, category, status);
 
   return (
     <div className="mt-6 flow-root">

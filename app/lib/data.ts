@@ -330,43 +330,102 @@ export async function fetchFillings() {
 
 export async function fetchFilteredFillings(
   query: string,
-  currentPage: number
+  currentPage: number,
+  category?: string,
+  status?: string
 ) {
   try {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-    const searchTerm = `%${query.toLowerCase()}%`;
+    const params: any[] = [];
+    const conditions: string[] = [];
+
+    // Base search term (for name/codebot)
+    if (query) {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      conditions.push(
+        `(LOWER(sabor_nombre) LIKE ? OR LOWER(sabor_codebot) LIKE ?)`
+      );
+      params.push(searchTerm, searchTerm);
+    }
+
+    // Category filter
+    if (category) {
+      conditions.push(`LOWER(sabor_categoria) = ?`);
+      params.push(category.toLowerCase());
+    }
+
+    // Status filter (assuming 1 = disponible, 0 = agotado)
+    if (status) {
+      const normalized = status.toLowerCase();
+      if (normalized === "disponible" || normalized === "agotado") {
+        conditions.push(`sabor_disponible = ?`);
+        params.push(normalized === "disponible" ? 1 : 0);
+      }
+    }
+
+    // Build final WHERE clause
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    // Add pagination
+    params.push(ITEMS_PER_PAGE, offset);
+
     const [response]: [QueryResult, FieldPacket[]] = await pool.query(
-      `SELECT * 
+      `
+      SELECT * 
       FROM sabores
-       WHERE (
-        LOWER(sabor_nombre) LIKE ? OR
-        LOWER(sabor_categoria) LIKE ?
-      )
+      ${whereClause}
       ORDER BY creado DESC
-      LIMIT ? OFFSET ?;`,
-      [searchTerm, searchTerm, ITEMS_PER_PAGE, offset]
+      LIMIT ? OFFSET ?;
+      `,
+      params
     );
-    const fillings: Sabores[] = response as Sabores[];
-    return fillings;
+
+    return response as Sabores[];
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new Error("Failed to fetch filtered fillings");
   }
 }
 
-export async function fetchFillingsPages(query: string) {
+
+export async function fetchFillingsPages(query?: string, category?: string, status?: string) {
   try {
-    const searchTerm = `%${query.toLowerCase()}%`;
+    const params: any[] = [];
+    const conditions: string[] = [];
+
+    // Base search term (for name/codebot)
+    if (query) {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      conditions.push(
+        `(LOWER(sabor_nombre) LIKE ? OR LOWER(sabor_codebot) LIKE ?)`
+      );
+      params.push(searchTerm, searchTerm);
+    }
+
+    // Category filter
+    if (category) {
+      conditions.push(`LOWER(sabor_categoria) = ?`);
+      params.push(category.toLowerCase());
+    }
+
+    // Status filter (assuming 1 = disponible, 0 = agotado)
+    if (status) {
+      const normalized = status.toLowerCase();
+      if (normalized === "disponible" || normalized === "agotado") {
+        conditions.push(`sabor_disponible = ?`);
+        params.push(normalized === "disponible" ? 1 : 0);
+      }
+    }
+
+    // Build final WHERE clause
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
     const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.query(
       `SELECT COUNT(*) AS total FROM (
         SELECT * 
       FROM sabores
-       WHERE (
-        LOWER(sabor_nombre) LIKE ? OR
-        LOWER(sabor_categoria) LIKE ?
-      )) n_fillings ;`,
-      [searchTerm, searchTerm]
+       ${whereClause}) n_fillings ;`,
+      params
     );
 
     const totalRows = rows[0].total as number;
